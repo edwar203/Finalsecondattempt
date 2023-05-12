@@ -20,32 +20,50 @@ class StantonAI():
         self.safespeed = 140
 
     def start(self):
-        self.running = 1
-        self.speed = 5
-        console.print(
-                Panel.fit(f"Starting Moving Speed Increased to {self.speed} MPH"
-                          , style = "italic dark_red")
-            )
+        if self.running  == 0:
+            self.running = 1
+            self.speed = 5
+            console.print(
+                    Panel.fit(f"Starting Moving Speed Increased to {self.speed} MPH"
+                              , style = "italic dark_red")
+                )
+        elif self.running == 1:
+            console.print(
+                Panel.fit(f"Your vehicle is already running please make a different selection!"
+                          , style = "italic dark_red"))
         
 
     def stop(self):
-        self.speed = 0
-        console.print(
-                Panel.fit("Now Stopping And Parking Vehicle"
+        if self.running == 1:
+            self.speed = 0
+            self.running = 0
+            console.print(
+                    Panel.fit("Now Stopping And Parking Vehicle"
+                          , style = "italic dark_red")
+                )
+        elif self.running == 0:
+            console.print(
+                Panel.fit(f"You are already parked please make a different selection!"
                           , style = "italic dark_red")
             )
-
     def speedup(self):
-        addspeed = console.input(
-                Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to add to your speed?"
+        if self.running == 0:
+            console.print(
+                Panel.fit(f"You are currently parked please start vehicle movement"
                           , style = "italic dark_red")
             )
-        self.chspeed = self.speed + addspeed
-        console.print(
-                Panel.fit(f"You have increased your speed from {self.speed}MPH to {self.chspeed}MPH"
-                          , style = "italic dark_red")
-            )
-        self.speed = self.chspeed
+            self.display_console()
+        elif self.running == 1:
+            addspeed = console.input(
+                    Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to add to your speed?"
+                              , style = "italic dark_red")
+                )
+            self.chspeed = self.speed + addspeed
+            console.print(
+                    Panel.fit(f"You have increased your speed from {self.speed}MPH to {self.chspeed}MPH"
+                              , style = "italic dark_red")
+                )
+            self.speed = self.chspeed
 
     def slowdown(self):
         respeed = console.input(
