@@ -132,14 +132,8 @@ class StantonAI():
                 Panel.fit(f"I'm afraid you have wrecked me because you were going {self.speed}MPH"
                           , style = "italic dark_red")
         )
-        self.eos()
-        
-    def eos(self):
-        console.print(
-                Panel.fit(f"Your vehicle is no longer servicable Goodbye"
-                          , style = "italic dark_red")
-        )
-        quit
+        self.speed = 0
+        self.shutdown()
 
     def random_event(self):
         self.event = random.randrange(1, 10)
