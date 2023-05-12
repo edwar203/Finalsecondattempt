@@ -2,8 +2,9 @@
     Name: self_driving.py
     Author: Bill Edwards
     Created: 05/12/2023
-    Description: Creating a program for a self driving console ran car with speed cap and random events
+    Description: Creating a program for a self driving console ran car with speed safe speed and random events based on unsafe speed
 """
+import math
 import random
 from rich.console import Console
 from rich.panel import Panel
@@ -18,6 +19,9 @@ class StantonAI():
         self.speed = 0
         self.running = 0
         self.safespeed = 140
+        self.addspeed = 0
+        self.respeed = 0
+        self.chspeed = 0
 
     def start(self):
         if self.running  == 0:
@@ -54,22 +58,30 @@ class StantonAI():
             )
             self.display_console()
         elif self.running == 1:
-            addspeed = console.input(
-                    Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to add to your speed?"
-                              , style = "italic dark_red")
+            console.print(
+                Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to add to your speed?"
+                        , style = "italic dark_red")
                 )
-            self.chspeed = self.speed + addspeed
+            self.addspeed = int(input())
+            self.chspeed = self.speed+self.addspeed
             console.print(
                     Panel.fit(f"You have increased your speed from {self.speed}MPH to {self.chspeed}MPH"
-                              , style = "italic dark_red")
+                             , style = "italic dark_red")
                 )
             self.speed = self.chspeed
 
     def slowdown(self):
-        respeed = console.input(
-                Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to remove from your speed?"
+        if self.running == 0:
+            console.print(
+                Panel.fit(f"You are currently parked please start vehicle movement"
                           , style = "italic dark_red")
             )
+        elif self.running == 1:
+            console.print(
+            Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to remove from your speed?"
+                      , style = "italic dark_red")
+        )
+        respeed = int(input())
         self.chspeed = self.speed - respeed
         console.print(
                 Panel.fit(f"You have decreased your speed from {self.speed}MPH to {self.chspeed}MPH"
@@ -93,13 +105,14 @@ class StantonAI():
     def decide(self):
         if self.speed < 0:
             console.print(
-                Panel.fit(f"You have attempted to go less then 0MPH which is impossible please increase to a real speed!"
+                Panel.fit(f"You have attempted to go less then 0MPH which is impossible please increase speed to moving again!"
                           , style = "italic dark_red")
             )
             self.speedup()
         elif self.speed < 141:
             self.display_console()
-        else:
+
+        elif self.speed > 140:
             self.random_event()
 
     def breakaway(self):
@@ -110,30 +123,38 @@ class StantonAI():
                 Panel.fit(f"As you sped up your tires broke loose from the road! \nLuckinly I got our speed back down to the safe speed of {self.safespeed}MPH "
                           , style = "italic dark_red")
             )
+            self.display_console()
         elif self.break_event in range(8,10):
             self.wreck()
 
     def wreck(self):
         console.print(
-                Panel.fit(f"I'm afraid you have wrecked me because you were going {self.speed}MPH GOODBYE"
+                Panel.fit(f"I'm afraid you have wrecked me because you were going {self.speed}MPH"
+                          , style = "italic dark_red")
+        )
+        self.eos()
+        
+    def eos(self):
+        console.print(
+                Panel.fit(f"Your vehicle is no longer servicable Goodbye"
                           , style = "italic dark_red")
         )
         quit
-        
 
     def random_event(self):
-        self.event = random.randrange(0, 10)
-        if self.event in range(0,5):
+        self.event = random.randrange(1, 10)
+        self.event_final = self.event
+        if self.event_final in range(1,5):
             self.display_console()
-        elif self.event in range(6,7):
+        elif self.event_final in range(6,7):
             self.breakaway()
-        elif self.event in range(8,10):
+        elif self.event_final in range(8,10):
             self.wreck()
 
 
     def display_console(self):
         console.print(
-                Panel.fit("To Start Moving Please Input 1 \nTo Speed Up Please Input 2 \nTo Slow Down Please Input 3 \nTo Stop And Park Please Input 4 \n To Quit Please Input 5"
+                Panel.fit("To Start Moving Please Input 1 \nTo Speed Up Please Input 2 \nTo Slow Down Please Input 3 \nTo Stop And Park Please Input 4 \n To Shutdown Please Input 5"
                           , style = "italic dark_red")
             )
         choice = console.input(Panel.fit("What would you like to do? (1, 2, 3, 4, or 5): ", style = "italic dark_red"))
