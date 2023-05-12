@@ -4,7 +4,6 @@
     Created: 05/12/2023
     Description: Creating a program for a self driving console ran car with speed cap and random events
 """
-import math
 import random
 from rich.console import Console
 from rich.panel import Panel
@@ -18,6 +17,7 @@ class StantonAI():
     def __init__(self):
         self.speed = 0
         self.running = 0
+        self.safespeed = 140
 
     def start(self):
         self.running = 1
@@ -37,22 +37,80 @@ class StantonAI():
 
     def speedup(self):
         addspeed = console.input(
-                Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would yo like to add to your speed?"
+                Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to add to your speed?"
                           , style = "italic dark_red")
             )
-        self.incspeed = self.speed + addspeed
+        self.chspeed = self.speed + addspeed
+        console.print(
+                Panel.fit(f"You have increased your speed from {self.speed}MPH to {self.chspeed}MPH"
+                          , style = "italic dark_red")
+            )
+        self.speed = self.chspeed
 
     def slowdown(self):
-        print("works")
+        respeed = console.input(
+                Panel.fit(f"You are currently going {self.speed}MPH \nHow Many MPH would you like to remove from your speed?"
+                          , style = "italic dark_red")
+            )
+        self.chspeed = self.speed - respeed
+        console.print(
+                Panel.fit(f"You have decreased your speed from {self.speed}MPH to {self.chspeed}MPH"
+                          , style = "italic dark_red")
+            )
+        self.speed = self.chspeed
 
+    def shutdown(self):
+        if self.speed == 0:
+            console.print(
+                    Panel.fit("You have chosen to shutdown the vehicle Goodbye"
+                            , style = "italic dark_red")
+            )
+            quit
+        else:
+            console.print(
+                Panel.fit(f"ERROR: Your vehicle is still moving Please Stop Vehicle First!!!"
+                          , style = "italic dark_red")
+            )
+            self.decide()
     def decide(self):
-        if self.speed < 141:
+        if self.speed < 0:
+            console.print(
+                Panel.fit(f"You have attempted to go less then 0MPH which is impossible please increase to a real speed!"
+                          , style = "italic dark_red")
+            )
+            self.speedup()
+        elif self.speed < 141:
             self.display_console()
         else:
             self.random_event()
 
+    def breakaway(self):
+        self.break_event = random.randrange(1,10)
+        if self.break_event in range(0,7):
+            self.speed = self.safespeed
+            console.print(
+                Panel.fit(f"As you sped up your tires broke loose from the road! \nLuckinly I got our speed back down to the safe speed of {self.safespeed}MPH "
+                          , style = "italic dark_red")
+            )
+        elif self.break_event in range(8,10):
+            self.wreck()
+
+    def wreck(self):
+        console.print(
+                Panel.fit(f"I'm afraid you have wrecked me because you were going {self.speed}MPH GOODBYE"
+                          , style = "italic dark_red")
+        )
+        quit
+        
+
     def random_event(self):
-        pass
+        self.event = random.randrange(0, 10)
+        if self.event in range(0,5):
+            self.display_console()
+        elif self.event in range(6,7):
+            self.breakaway()
+        elif self.event in range(8,10):
+            self.wreck()
 
 
     def display_console(self):
@@ -75,7 +133,7 @@ class StantonAI():
             self.stop()
             self.decide()
         elif choice == "5":
-            quit
+            self.shutdown()
 
 #Create Main
 def main():
@@ -83,6 +141,10 @@ def main():
     console.print(
                 Panel.fit(" --  StantonAI's Self Driving Car  --  ", style = "bold dark_red", subtitle="By: Bill Edwards")
             )
+    console.print(
+                Panel.fit("You are in a self driving car please increase or decrease speed as you like. Anything over 140MPH is not suggested as those are over safe speeds"
+                          , style = "italic dark_red")
+    )
     #run anything not in class
 
     #run class
